@@ -18,7 +18,7 @@ const Home: React.FC = () => {
                     </h1>
                     <p>Ajudamos pessoas a encontrarem pontos e coleta de forma eficiente.</p>
 
-                    <a href="/cadastro">
+                    <a href="/create-point">
                         <span>
                             <FiLogIn />
                         </span>
