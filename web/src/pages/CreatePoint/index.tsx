@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
-import { Map, TileLayer, Mark } from 'react-leaflet';
+import { Map, TileLayer, Marker } from 'react-leaflet';
 
 import './styles.css';
 
@@ -64,7 +64,7 @@ const CreatePoint: React.FC = () => {
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
 
-                        <Mark  position={[-22.6752336, 47.7545854]}/>
+                        <Marker  position={[-22.6752336, 47.7545854]}/>
                     </Map>
 
                     <div className="field-group">
