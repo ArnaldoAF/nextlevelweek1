@@ -36,6 +36,8 @@ const CreatePoint: React.FC = () => {
     const [selectedCity, setSelectedCity] = useState('0');
     const [selectedPosition, setSelectedPosition] = useState<[number,number]>([0,0]);
 
+    const [initialPosition, setInitialPosition] = useState<[number,number]>([0,0]);
+
     useEffect(() => {
         api.get('itens').then(response => {
             console.log(response);;
@@ -50,6 +52,19 @@ const CreatePoint: React.FC = () => {
             setUfs(ufInitials);
         })
     },[]);
+
+    useEffect(() => {
+        const currentPosition = navigator.geolocation.getCurrentPosition(position => {
+            const { latitude, longitude } = position.coords;
+            
+            setInitialPosition([latitude, longitude]);
+            console.log([latitude, longitude]);
+            console.log(initialPosition,"initialPosition");
+            console.log(selectedPosition,"selectedPosition");
+        });
+        
+
+    },[])
 
     useEffect(() => {
         if (selectedUf == '0') return;
@@ -130,13 +145,13 @@ const CreatePoint: React.FC = () => {
                         <span>Selecione o endereço no mapa</span>
                     </legend>
 
-                    <Map center={[-22.6752336, 47.7545854]} zoom={15} onClick={handleMapClick}>
+                    <Map center={initialPosition} zoom={15} onClick={handleMapClick}>
                         <TileLayer
                             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
 
-                        <Marker position={selectedPosition} />
+                        <Marker position={selectedPosition[0] == 0 && selectedPosition[1] == 0 ? initialPosition : selectedPosition} />
                     </Map>
 
                     <div className="field-group">
