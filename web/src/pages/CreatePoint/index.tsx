@@ -1,5 +1,5 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 
@@ -33,7 +33,7 @@ const CreatePoint: React.FC = () => {
     const [ufs, setUfs] = useState<string[]>([]);
     const [cities, setCities] = useState<string[]>([]);
     const [formData, setFormData] = useState({
-        nome: '',
+        name: '',
         email: '',
         whatsapp: ''
     });
@@ -43,6 +43,7 @@ const CreatePoint: React.FC = () => {
     const [selectedPosition, setSelectedPosition] = useState<[number,number]>([0,0]);
 
     const [initialPosition, setInitialPosition] = useState<[number,number]>([0,0]);
+    const history = useHistory();
 
     useEffect(() => {
         api.get('itens').then(response => {
@@ -121,14 +122,14 @@ const CreatePoint: React.FC = () => {
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
     
-        const { nome, email, whatsapp} = formData;
+        const { name, email, whatsapp} = formData;
         const uf = selectedUf;
         const city = selectedCity;
         const [latitude, longitude] = selectedPosition;
         const itemsList = items.filter(item => item.selected).map(item => item.id);
 
         const data ={
-            name:nome,
+            name,
             email,
             whatsapp,
             uf,
@@ -142,6 +143,7 @@ const CreatePoint: React.FC = () => {
 
         console.log(data);
         alert('sucess');
+        history.push('/');
     }
 
     return (
