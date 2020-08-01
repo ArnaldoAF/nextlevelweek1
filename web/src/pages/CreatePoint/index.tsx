@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
@@ -15,6 +15,7 @@ interface Item {
     id: number;
     title: string;
     imageUrl: string;
+    selected: boolean;
 }
 
 interface IBGEUFresponse {
@@ -31,6 +32,11 @@ const CreatePoint: React.FC = () => {
     
     const [ufs, setUfs] = useState<string[]>([]);
     const [cities, setCities] = useState<string[]>([]);
+    const [formData, setFormData] = useState({
+        nome: '',
+        email: '',
+        whatsapp: ''
+    });
 
     const [selectedUf, setSelectedUf] = useState('0');
     const [selectedCity, setSelectedCity] = useState('0');
@@ -40,7 +46,7 @@ const CreatePoint: React.FC = () => {
 
     useEffect(() => {
         api.get('itens').then(response => {
-            console.log(response);;
+            console.log(response);
             setItems(response.data);
         })
     },[]);
@@ -95,6 +101,49 @@ const CreatePoint: React.FC = () => {
         ])
     }
 
+    function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+        console.log(event.target.name, event.target.value);
+        const { name, value } = event.target;
+
+        setFormData({
+            ...formData,
+            [name]: value
+        })
+    }
+
+    function handleSelectedItem(id: number) {
+        let localList = items.map(x => x);
+        console.log(localList);
+        localList[id-1].selected = !localList[id-1].selected;
+        setItems(localList);
+    }
+
+    async function handleSubmit(event: FormEvent) {
+        event.preventDefault();
+    
+        const { nome, email, whatsapp} = formData;
+        const uf = selectedUf;
+        const city = selectedCity;
+        const [latitude, longitude] = selectedPosition;
+        const itemsList = items.filter(item => item.selected).map(item => item.id);
+
+        const data ={
+            name:nome,
+            email,
+            whatsapp,
+            uf,
+            city,
+            latitude,
+            longitude,
+            itens:itemsList
+        };
+
+        await api.post('points', data);
+
+        console.log(data);
+        alert('sucess');
+    }
+
     return (
         <div id="page-create-point">
             <header>
@@ -105,7 +154,7 @@ const CreatePoint: React.FC = () => {
                 </Link>
             </header>
 
-            <form action="">
+            <form onSubmit={handleSubmit}>
                 <h1>Cadastro do <br /> ponto de coleta</h1>
 
                 <fieldset>
@@ -118,7 +167,8 @@ const CreatePoint: React.FC = () => {
                         <input
                             type="text"
                             id="name"
-                            name="name" />
+                            name="name"
+                            onChange={handleInputChange} />
                     </div>
 
                     <div className="field-group">
@@ -127,14 +177,16 @@ const CreatePoint: React.FC = () => {
                             <input
                                 type="email"
                                 id="email"
-                                name="email" />
+                                name="email"
+                                onChange={handleInputChange} />
                         </div>
                         <div className="field">
                             <label htmlFor="whatsapp">whatsapp</label>
                             <input
                                 type="text"
                                 id="whatsapp"
-                                name="whatsapp" />
+                                name="whatsapp"
+                                onChange={handleInputChange} />
                         </div>
                     </div>
                 </fieldset>
@@ -183,9 +235,12 @@ const CreatePoint: React.FC = () => {
                     </legend>
                     <ul className="items-grid">
                         {items.map(item => (
-                            <li key={item.id}>
+                            <li key={item.id} 
+                                onClick={() => handleSelectedItem(item.id)}
+                                className={item.selected ? "selected" : "none"}>
                                 <img src={item.imageUrl} alt={item.title} />
                                 <span>{item.title}</span>
+                                <span>{item.selected}</span>
                             </li>
                         ))}
 
